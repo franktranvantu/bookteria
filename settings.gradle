@@ -1,0 +1,13 @@
+rootProject.name = 'bookteria'
+include 'api-gateway'
+include 'book-service'
+include 'file-service'
+include 'identity-service'
+include 'mobile-app'
+include 'notification-service'
+include 'post-service'
+include 'api-gateway'
+include 'search-service'
+include 'web-app'
+include 'profile-service'
+

@@ -1,0 +1,126 @@
+plugins {
+    id "java"
+    id "jacoco"
+    id "org.springframework.boot" version "${springBootVersion}"
+    id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
+    id "com.diffplug.spotless" version "${spotlessVersion}"
+    id "org.sonarqube" version "${sonarQubeVersion}"
+}
+
+java {
+    sourceCompatibility = '17'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    // Jpa
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    // Validation
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    // Spring Cloud OpenFeign
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    // Mapstruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+    // Security
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    // JDBC Connector
+    runtimeOnly "com.mysql:mysql-connector-j"
+
+    // Starter test
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    // Security test
+    testImplementation "org.springframework.security:spring-security-test"
+    // Jackson converter
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatatypeJsr310Version}"
+    // H2
+    testImplementation "com.h2database:h2:${h2DatabaseVersion}"
+}
+
+compileJava {
+    options.compilerArgs = [
+            "-parameters",
+            "-Amapstruct.suppressGeneratorTimestamp=true",
+            "-Amapstruct.defaultComponentModel=spring",
+            "-Amapstruct.verbose=true"
+    ]
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.85
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'com/franktranvantu/bookteria/identity/configuration/**',
+                    'com/franktranvantu/bookteria/identity/dto/**',
+                    'com/franktranvantu/bookteria/identity/entity/**',
+                    'com/franktranvantu/bookteria/identity/constant/**',
+                    'com/franktranvantu/bookteria/identity/exeption/**',
+                    'com/franktranvantu/bookteria/identity/mapper/**',
+                    'com/franktranvantu/bookteria/identity/repository/**',
+                    'com/franktranvantu/bookteria/identity/validator/**'
+
+            ])
+        }))
+    }
+}
+
+spotless {
+    java {
+        removeUnusedImports()
+        palantirJavaFormat()
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "spring-boot-3")
+        property("sonar.login", "sqp_5417d0f35e13b4ef33f3515d2534af6897777b76")
+        property("sonar.host.url", "http://localhost:9000")
+        property("sonar.exclusions", [
+                'com/franktranvantu/bookteria/identity/configuration/**',
+                'com/franktranvantu/bookteria/identity/dto/**',
+                'com/franktranvantu/bookteria/identity/entity/**',
+                'com/franktranvantu/bookteria/identity/constant/**',
+                'com/franktranvantu/bookteria/identity/exeption/**',
+                'com/franktranvantu/bookteria/identity/mapper/**',
+                'com/franktranvantu/bookteria/identity/repository/**',
+                'com/franktranvantu/bookteria/identity/validator/**'
+
+        ])
+    }
+}

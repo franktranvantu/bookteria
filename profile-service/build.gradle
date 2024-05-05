@@ -1,0 +1,105 @@
+plugins {
+    id "java"
+    id "jacoco"
+    id "org.springframework.boot" version "${springBootVersion}"
+    id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
+    id "com.diffplug.spotless" version "${spotlessVersion}"
+    id "org.sonarqube" version "${sonarQubeVersion}"
+}
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Web
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    // Neo4j
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
+    // Lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    // Mapstruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+    // Starter test
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    // Jackson converter
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonDatatypeJsr310Version}"
+}
+
+compileJava {
+    options.compilerArgs = [
+            "-parameters",
+            "-Amapstruct.suppressGeneratorTimestamp=true",
+            "-Amapstruct.defaultComponentModel=spring",
+            "-Amapstruct.verbose=true"
+    ]
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.85
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    'com/franktranvantu/bookteria/profile/configuration/**',
+                    'com/franktranvantu/bookteria/profile/dto/**',
+                    'com/franktranvantu/bookteria/profile/entity/**',
+                    'com/franktranvantu/bookteria/profile/constant/**',
+                    'com/franktranvantu/bookteria/profile/exeption/**',
+                    'com/franktranvantu/bookteria/profile/mapper/**',
+                    'com/franktranvantu/bookteria/profile/repository/**',
+                    'com/franktranvantu/bookteria/profile/validator/**'
+            ])
+        }))
+    }
+}
+
+spotless {
+    java {
+        removeUnusedImports()
+        palantirJavaFormat()
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "spring-boot-3")
+        property("sonar.login", "sqp_5417d0f35e13b4ef33f3515d2534af6897777b76")
+        property("sonar.host.url", "http://localhost:9000")
+        property("sonar.exclusions", [
+                'com/franktranvantu/bookteria/profile/configuration/**',
+                'com/franktranvantu/bookteria/profile/dto/**',
+                'com/franktranvantu/bookteria/profile/entity/**',
+                'com/franktranvantu/bookteria/profile/constant/**',
+                'com/franktranvantu/bookteria/profile/exeption/**',
+                'com/franktranvantu/bookteria/profile/mapper/**',
+                'com/franktranvantu/bookteria/profile/repository/**',
+                'com/franktranvantu/bookteria/profile/validator/**'
+        ])
+    }
+}
