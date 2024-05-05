@@ -1,0 +1,72 @@
+plugins {
+    id "java"
+    id "jacoco"
+    id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
+    id "com.diffplug.spotless" version "${spotlessVersion}"
+    id "org.sonarqube" version "${sonarQubeVersion}"
+}
+
+java {
+    sourceCompatibility = '17'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Cloud Starter Gateway
+    implementation "org.springframework.cloud:spring-cloud-starter-gateway"
+}
+
+compileJava {
+    options.compilerArgs = [
+            "-parameters",
+            "-Amapstruct.suppressGeneratorTimestamp=true",
+            "-Amapstruct.defaultComponentModel=spring",
+            "-Amapstruct.verbose=true"
+    ]
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.85
+            }
+        }
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+}
+
+spotless {
+    java {
+        removeUnusedImports()
+        palantirJavaFormat()
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "spring-boot-3")
+        property("sonar.login", "sqp_5417d0f35e13b4ef33f3515d2534af6897777b76")
+        property("sonar.host.url", "http://localhost:9000")
+    }
+}

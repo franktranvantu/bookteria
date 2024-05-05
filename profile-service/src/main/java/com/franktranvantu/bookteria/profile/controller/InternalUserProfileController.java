@@ -6,34 +6,27 @@ import com.franktranvantu.bookteria.profile.service.UserProfileService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/internal-users")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserProfileController {
+public class InternalUserProfileController {
     UserProfileService userProfileService;
 
-    @PostMapping
-    public UserProfileResponse createUser(@RequestBody UserProfileRequest request) {
-        return userProfileService.createUserProfile(request);
+    @PutMapping("/{profileId}")
+    public UserProfileResponse updateUser(@PathVariable String profileId, @RequestBody UserProfileRequest request) {
+        return userProfileService.updateUserProfile(profileId, request);
     }
 
-    @GetMapping
-    public List<UserProfileResponse> getUsers() {
-        return userProfileService.getUserProfiles();
-    }
-
-    @GetMapping("/{profileId}")
-    public UserProfileResponse getUser(@PathVariable String profileId) {
-        return userProfileService.getUserProfile(profileId);
+    @DeleteMapping("/{profileId}")
+    public void deleteUser(@PathVariable String profileId) {
+        userProfileService.deleteUserProfile(profileId);
     }
 }

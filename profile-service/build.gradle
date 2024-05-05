@@ -11,6 +11,13 @@ java {
     sourceCompatibility = '17'
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 repositories {
     mavenCentral()
 }
